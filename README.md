@@ -1,8 +1,12 @@
-# ML-Based Network Intrusion Detection System (NIDS)
+# NetSentinel — ML Network Intrusion Detection + RAG SOC Copilot
 
-Detecting malicious network activity (port scans, DDoS, brute-force, etc.) by applying
-machine learning to network traffic data. Built to bridge a data science / analytics
-background into network security & SOC-style detection work.
+**Detect and explain.** NetSentinel applies machine learning to network traffic to flag
+malicious activity (port scans, DDoS, brute-force, etc.), then uses a Retrieval-Augmented
+Generation (RAG) "SOC Copilot" to explain each alert in plain English — grounded in a
+security knowledge base. Built to bridge a data science / analytics background into network
+security & SOC-style detection work.
+
+_Stack: Python · scikit-learn · sentence-transformers · Chroma · Ollama (local, $0)._
 
 ## Why this project
 Security Operations Centers (SOCs) and detection engineering teams drown in network and
@@ -10,21 +14,26 @@ log data. This project applies ML/analytics to that data to automatically flag i
 the intersection of data science and network defense.
 
 ## Roadmap
-- [ ] **Phase 1 – Foundations + first model** (NSL-KDD): understand network flows & attack
-      categories, build and evaluate a first classifier.
-- [ ] **Phase 2 – Realistic data** (CICIDS2017): modern attacks, flow features, class imbalance.
-- [ ] **Phase 3 – Detection engineering**: precision/recall tuning, confusion analysis,
-      false-positive cost.
+- [x] **Phase 1 – Foundations + first model** (NSL-KDD): network flows & attack categories;
+      Random Forest classifier evaluated on the official test set (precision 0.97, recall 0.61 —
+      first look at the generalization gap).
+- [x] **Phase 2 – Realistic data** (CICIDS2017): ~2.5M flows across 7 days; recall measured
+      *per attack type*; cross-day tests expose held-out attacks (e.g. PortScan) dropping to
+      ~0% recall — the limit of supervised detection on novel attacks.
+- [x] **Phase 3 – Detection engineering**: confusion matrices, precision-recall curves, and
+      decision-threshold tuning; choosing operating points by false-positive cost.
+- [~] **Phase 7 – SOC Copilot (RAG, $0)** *(fast-tracked, in progress)*: a Retrieval-Augmented
+      Generation assistant that explains each flagged alert in plain English using a security
+      knowledge base (attack descriptions + MITRE ATT&CK + remediation). Fully local:
+      Ollama (LLM) + sentence-transformers (embeddings) + Chroma (vector store). **Done:**
+      knowledge base built (chunk → embed → store, semantic retrieval verified).
 - [ ] **Phase 4 – Live capture**: sniff real traffic with scapy, extract features, score it live.
 - [ ] **Phase 5 – Portfolio polish**: dashboard, writeup, GitHub README.
 - [ ] **Phase 6 – Cloud integration ($0)**: deploy the detector as a service and ingest
       real cloud security logs (public AWS VPC Flow Logs / CloudTrail samples), using
       LocalStack + free tiers only. No paid cloud resources.
-- [ ] **Phase 7 – SOC Copilot (RAG, $0)**: build a Retrieval-Augmented Generation
-      assistant that explains each flagged alert in plain English using a security
-      knowledge base (MITRE ATT&CK, attack descriptions, remediation). Fully local:
-      Ollama (LLM) + sentence-transformers (embeddings) + Chroma/FAISS (vector store).
-      Teaches embeddings, chunking, retrieval, prompt augmentation.
+
+> See [`architecture.md`](architecture.md) for the system design (detection engine + RAG copilot).
 
 ## Structure
 ```
